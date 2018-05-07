@@ -458,6 +458,10 @@ func RunningOnVMM(cpuInfoPath string) (bool, error) {
 		return false, nil
 	}
 
+	if runtime.GOARCH == "ppc64le" {
+		virtLog.Debugf("Unable to know if the system is running inside a VM")
+		return false, nil
+	}
 	flagsField := "flags"
 
 	f, err := os.Open(cpuInfoPath)

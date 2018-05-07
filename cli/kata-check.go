@@ -222,44 +222,6 @@ func checkKernelModules(modules map[string]kernelModule, handler kernelParamHand
 	return count, nil
 }
 
-// hostIsVMContainerCapable checks to see if the host is theoretically capable
-// of creating a VM container.
-func hostIsVMContainerCapable(details vmContainerCapableDetails) error {
-	cpuinfo, err := getCPUInfo(details.cpuInfoFile)
-	if err != nil {
-		return err
-	}
-
-	cpuFlags := getCPUFlags(cpuinfo)
-	if cpuFlags == "" {
-		return fmt.Errorf("Cannot find CPU flags")
-	}
-
-	// Keep a track of the error count, but don't error until all tests
-	// have been performed!
-	errorCount := uint32(0)
-
-	count := checkCPUAttribs(cpuinfo, details.requiredCPUAttribs)
-
-	errorCount += count
-
-	count = checkCPUFlags(cpuFlags, details.requiredCPUFlags)
-
-	errorCount += count
-
-	count, err = checkKernelModules(details.requiredKernelModules, archKernelParamHandler)
-	if err != nil {
-		return err
-	}
-
-	errorCount += count
-
-	if errorCount == 0 {
-		return nil
-	}
-
-	return fmt.Errorf("ERROR: %s", failMessage)
-}
 
 var kataCheckCLICommand = cli.Command{
 	Name:  checkCmd,
